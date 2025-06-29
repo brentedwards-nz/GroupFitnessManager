@@ -56,7 +56,35 @@ export default function SignInComponent() {
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     setMessage("");
-    setSuccess(true);
+    setSuccess(true); // Assuming success until an error occurs
+
+    const redirectToUrl = `${window.location.origin}/auth/callback?next=/admin/dashboard`;
+    const supabase = await createSupabaseBrowserClient();
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectToUrl,
+        },
+      });
+
+      if (error) {
+        setMessage(`Error signing in with Google: ${error.message}`);
+        setSuccess(false);
+      } else {
+        // No direct message here, as the user will be redirected to Google for authentication
+        // and then back to your redirect URL.
+      }
+    } catch (error) {
+      console.error("Google Sign-In error:", error);
+      setMessage(
+        "An unexpected error occurred during Google Sign-In. Please try again."
+      );
+      setSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFacebookSignIn = async () => {
