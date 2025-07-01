@@ -1,32 +1,27 @@
-// app/layout.tsx
-import { createSupabaseServerClient } from "../lib/superbase/server";
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import SupabaseProvider from "./providers/SuperbaseProvider";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
 
-export default async function RootLayout({
+export const metadata = {
+  metadataBase: new URL(defaultUrl),
+  title: "Next.js and Supabase Starter Kit",
+  description: "The fastest way to build apps with Next.js and Supabase",
+};
+
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createSupabaseServerClient();
-
-  // 🧠 THIS parses tokens from the URL and sets session cookies
-  await supabase.auth.getSession();
-
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SupabaseProvider>{children}</SupabaseProvider>
-        {children}
+    <html lang="en" className={GeistSans.className}>
+      <body className="bg-background text-foreground">
+        <main className="min-h-screen flex flex-col items-center">
+          {children}
+        </main>
       </body>
     </html>
   );
