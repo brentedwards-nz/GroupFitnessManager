@@ -33,12 +33,18 @@ export async function magicSignIn(
 
   console.log("Data prepared for sign-in:", { email });
 
+  // Define the base redirect URL for the callback
+  const baseRedirectToUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`;
+
+  // --- IMPORTANT CHANGE HERE ---
+  // Append the 'next' query parameter to redirect to /dashboard
+  const emailRedirectToUrl = `${baseRedirectToUrl}?next=/dashboard`;
+  // --- END IMPORTANT CHANGE ---
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      // It's good practice to specify where Supabase should redirect *after* the user clicks the magic link in their email.
-      // Make sure NEXT_PUBLIC_BASE_URL is set in your .env file (e.g., http://localhost:3000 or your domain)
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`,
+      emailRedirectTo: emailRedirectToUrl,
     },
   });
 
@@ -63,12 +69,6 @@ export async function magicSignIn(
       message: userFriendlyMessage,
     };
   }
-
-  // --- Optional: Revalidate if necessary (less critical when not redirecting) ---
-  // revalidatePath("/", "layout");
-  // If your form or page doesn't directly depend on authentication status changing
-  // *immediately* on the current page, you might not need this here.
-  // It's usually more relevant after a successful login when the user is redirected.
 
   return {
     success: true,

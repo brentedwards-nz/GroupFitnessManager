@@ -1,53 +1,61 @@
-import DeployButton from "../components/DeployButton";
-import AuthButton from "../components/AuthButton";
-import { createClient } from "@/utils/supabase/server";
-import ConnectSupabaseSteps from "@/components/tutorial/ConnectSupabaseSteps";
-import SignUpUserSteps from "@/components/tutorial/SignUpUserSteps";
-import Header from "@/components/Header";
+// src/app/page.tsx
+
+import { createClient } from "@/utils/supabase/server"; // Import your server-side Supabase client
+import Link from "next/link"; // Import Link for client-side navigation
 
 export default async function Index() {
-  const canInitSupabaseClient = () => {
-    // This function is just for the interactive tutorial.
-    // Feel free to remove it once you have Supabase connected.
-    try {
-      createClient();
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const isSupabaseConnected = canInitSupabaseClient();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
-    <div className="flex-1 w-full flex flex-col gap-20 items-center">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-4xl flex justify-between items-center p-3 text-sm">
-          <DeployButton />
-          {isSupabaseConnected && <AuthButton />}
-        </div>
-      </nav>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-foreground bg-background">
+      <div className="text-center max-w-2xl px-4">
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 animate-gradient-x">
+          Group Fitness Manager
+        </h1>
+        <p className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed">
+          The ultimate application for streamlining **Group Fitness programs**
+          for gyms. Effortlessly manage **class timetables** and
+          **instructors**, ensuring your fitness operations run smoothly.
+        </p>
 
-      <div className="animate-in flex-1 flex flex-col gap-20 opacity-0 max-w-4xl px-3">
-        <Header />
-        <main className="flex-1 flex flex-col gap-6">
-          <h2 className="font-bold text-4xl mb-4">Next steps</h2>
-          {isSupabaseConnected ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-        </main>
+        {user ? (
+          // User is logged in
+          <div className="mt-8">
+            <p className="text-xl text-gray-200 mb-4">
+              Welcome back, {user.email?.split("@")[0]}!
+            </p>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10 transition duration-300 ease-in-out"
+            >
+              Go to Your Dashboard
+            </Link>
+          </div>
+        ) : (
+          // User is not logged in
+          <div className="mt-8">
+            <p className="text-xl text-gray-200 mb-4">
+              Ready to revolutionize your gym's group fitness?
+            </p>
+            <Link
+              href="/magic" // Link to your login/sign-up page
+              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 md:py-4 md:text-lg md:px-10 transition duration-300 ease-in-out"
+            >
+              Login / Sign Up
+            </Link>
+          </div>
+        )}
       </div>
 
-      <footer className="w-full border-t border-t-foreground/10 p-8 flex justify-center text-center text-xs">
+      <footer className="mt-20 text-sm text-gray-500">
         <p>
-          Powered by{" "}
-          <a
-            href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-            target="_blank"
-            className="font-bold hover:underline"
-            rel="noreferrer"
-          >
-            Supabase
-          </a>
+          &copy; {new Date().getFullYear()} Group Fitness Manager. All rights
+          reserved.
         </p>
+        <p className="mt-2">Powered by Next.js and Supabase</p>
       </footer>
     </div>
   );

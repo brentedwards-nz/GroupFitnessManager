@@ -40,7 +40,7 @@ export default function Magic() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: provider, // Use the passed provider string
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`, // Consistent redirect URL
+        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
       },
     });
 
@@ -57,6 +57,11 @@ export default function Magic() {
         className="animate-in flex flex-col w-full justify-center gap-2 text-foreground"
         action={formAction} // <--- IMPORTANT: Use the formAction from useFormState
       >
+        <div className="text-center max-w-2xl px-4">
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 animate-gradient-x">
+            Sign In
+          </h1>
+        </div>
         <label className="text-md" htmlFor="email">
           Email
         </label>
@@ -114,6 +119,9 @@ export default function Magic() {
           <IconBrandFacebook />
           Facebook
         </Button>
+      </div>
+      <div className="space-x-2 flex justify-center">
+        <Link href={"/"}>Home</Link>
       </div>
     </div>
   );
