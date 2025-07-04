@@ -11,7 +11,11 @@ interface ProfileData {
   birth_date: string | null; // Use string for date input type="date"
 }
 
-export default function ProfileEditor() {
+interface ProfileEditorProps {
+  auth_id: string;
+}
+
+export default function ProfileEditor({ auth_id }: ProfileEditorProps) {
   const supabase = createBrowserSupabaseClient();
 
   const [profile, setProfile] = useState<ProfileData>({
@@ -46,7 +50,7 @@ export default function ProfileEditor() {
       const { data, error } = await supabase
         .from("profiles")
         .select("first_name, last_name, birth_date")
-        .eq("id", currentUser.id)
+        .eq("auth_id", auth_id)
         .single(); // Use single() because 'id' is unique
 
       if (error) {
@@ -86,7 +90,7 @@ export default function ProfileEditor() {
         last_name: profile.last_name,
         birth_date: profile.birth_date,
       })
-      .eq("id", user.id); // Crucial: Update only the current user's profile
+      .eq("auth_id", user.id); // Crucial: Update only the current user's profile
 
     if (updateError) {
       console.error("Error updating profile:", updateError);
@@ -103,16 +107,6 @@ export default function ProfileEditor() {
         {" "}
         {/* Min height for loading state */}
         <p className="text-xl text-gray-300">Loading profile data...</p>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="text-center p-4 text-gray-400">
-        <p>Please log in to view and edit your profile information.</p>
-        {/* You could optionally add a Link to the login page here,
-            but typically the parent page or middleware handles redirection. */}
       </div>
     );
   }

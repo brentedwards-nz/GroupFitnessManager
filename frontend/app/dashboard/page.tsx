@@ -45,7 +45,7 @@ export default async function DashboardPage() {
         </p>
 
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-          <Profile />
+          <Profile auth_id={user.id} />
         </div>
 
         {/* --- Sign Out Button on the Dashboard --- */}

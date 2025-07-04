@@ -16,6 +16,9 @@ export async function magicSignIn(
   prevState: { success: boolean; message: string },
   formData: FormData
 ): Promise<{ success: boolean; message: string }> {
+  console.log("--- Starting magicSignIn server action ---"); // <-- ADD THIS
+  console.log("Current time:", new Date().toISOString()); // <-- ADD THIS
+
   console.log("magicSignIn called");
   const supabase = await createClient();
   console.log("Supabase client created");
@@ -32,6 +35,10 @@ export async function magicSignIn(
   // You might want more robust validation using libraries like Zod
 
   console.log("Data prepared for sign-in:", { email });
+  console.log(
+    "Value of NEXT_PUBLIC_BASE_URL:",
+    process.env.NEXT_PUBLIC_BASE_URL
+  ); // <-- CRITICAL: WHAT DOES THIS SHOW?
 
   // Define the base redirect URL for the callback
   const baseRedirectToUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback`;
@@ -41,11 +48,19 @@ export async function magicSignIn(
   const emailRedirectToUrl = `${baseRedirectToUrl}?next=/dashboard`;
   // --- END IMPORTANT CHANGE ---
 
+  console.log(
+    "Constructed emailRedirectToUrl for options:",
+    emailRedirectToUrl
+  ); // <-- CRITICAL: WHAT DOES THIS SHOW?
+  const otpOptions = {
+    emailRedirectTo: emailRedirectToUrl,
+  };
+  console.log("Options passed to signInWithOtp:", JSON.stringify(otpOptions)); // <-- CRITICAL: WHAT DOES THIS SHOW?
+  // --- END LINES TO ADD/CONFIRM ---
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: {
-      emailRedirectTo: emailRedirectToUrl,
-    },
+    options: otpOptions,
   });
 
   if (error) {
