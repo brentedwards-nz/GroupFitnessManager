@@ -1,27 +1,43 @@
-import { type EmailOtpType } from '@supabase/supabase-js'
-import { type NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
+// File: src/app/auth/callback/route.ts
+import { type NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server"; // Your server-side Supabase client
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
-  const token_hash = searchParams.get('token_hash')
-  const type = searchParams.get('type') as EmailOtpType | null
-  const next = searchParams.get('next') ?? '/'
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get("code"); // <-- Correctly get the 'code' parameter
 
-  if (token_hash && type) {
-    const supabase = await createClient()
+  // The 'next' path to redirect to after successful login (defaults to '/')
+  const next = requestUrl.searchParams.get("next") ?? "/";
 
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    })
+  console.log("auth/callback route called next:", next); // This log is fine
+
+  if (code) {
+    // Check if the 'code' parameter exists
+    const supabase = await createClient();
+
+    // --- IMPORTANT CHANGE: Use exchangeCodeForSession for magic links ---
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    // --- END IMPORTANT CHANGE ---
+
     if (!error) {
-      // redirect user to specified redirect URL or root of app
-      redirect(next)
+      // Success! Redirect to the 'next' path.
+      // NextResponse.redirect handles setting cookies on the response before the redirect.
+      const redirectUrl = requestUrl.origin + next;
+      return NextResponse.redirect(redirectUrl);
+    } else {
+      // Log the actual error from exchangeCodeForSession
+      console.error("Supabase exchangeCodeForSession error:", error.message);
+      // If there's an error in exchanging the code, redirect to error page.
+      const errorUrl =
+        requestUrl.origin +
+        "/error?message=" +
+        encodeURIComponent(error.message || "Could not log you in.");
+      return NextResponse.redirect(errorUrl);
     }
   }
 
-  // redirect the user to an error page with some instructions
-  redirect('/error')
+  // If no 'code' parameter was found in the URL, something is wrong.
+  const errorUrl =
+    requestUrl.origin + "/error?message=No authentication code provided.";
+  return NextResponse.redirect(errorUrl);
 }
