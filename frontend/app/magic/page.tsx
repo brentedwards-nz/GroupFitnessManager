@@ -52,9 +52,9 @@ export default function Magic() {
   // --- END REFACTORED ---
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-8">
       <form
-        className="animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground"
+        className="animate-in flex flex-col w-full justify-center gap-2 text-foreground"
         action={formAction} // <--- IMPORTANT: Use the formAction from useFormState
       >
         <label className="text-md" htmlFor="email">
