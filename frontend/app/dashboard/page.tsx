@@ -4,6 +4,7 @@
 import { createClient } from "@/utils/supabase/server"; // Server-side Supabase client
 import { signOut } from "@/app/auth/signout/actions"; // Import the sign out action
 import Link from "next/link"; // For any internal navigation links
+import Profile from "@/components/profile/Profile";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -43,24 +44,8 @@ export default async function DashboardPage() {
           dashboard for Group Fitness Manager.
         </p>
 
-        {/* You can add dashboard-specific content here */}
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-          <h2 className="text-2xl font-semibold mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Link
-              href="#"
-              className="py-3 px-6 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition duration-200"
-            >
-              Manage Classes
-            </Link>
-            <Link
-              href="#"
-              className="py-3 px-6 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition duration-200"
-            >
-              Manage Instructors
-            </Link>
-            {/* Add more dashboard links as needed */}
-          </div>
+          <Profile />
         </div>
 
         {/* --- Sign Out Button on the Dashboard --- */}
