@@ -14,7 +14,7 @@ const SignIn = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <LoginCard formAction={formAction} formState={state} />
+      <LoginCard />
     </div>
   );
 };
