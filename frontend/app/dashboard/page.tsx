@@ -1,72 +1,60 @@
-// src/app/dashboard/page.tsx
-// This page is a Server Component by default
+import HomeButton from "@/components/buttons/HomeButton";
+import { AppSidebar } from "@/components/sidebars/sidebar-with-submenus";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 
-import { createClient } from "@/utils/supabase/server"; // Server-side Supabase client
-import { signOut } from "@/app/auth/signout/actions"; // Import the sign out action
-import Link from "next/link"; // For any internal navigation links
-import Profile from "@/components/profile/Profile";
-
-export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  // Basic check for logged-in user, though middleware should handle redirects
-  if (error || !user) {
-    // This case should ideally be caught by middleware redirecting to /magic
-    // But it's good practice to have a fallback or show a "not logged in" message.
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-foreground bg-background text-center">
-        <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
-        <p className="text-lg mb-8">
-          You must be logged in to view the dashboard.
-        </p>
-        <Link
-          href="/auth/signin"
-          className="py-2 px-4 rounded-md no-underline bg-blue-600 text-white hover:bg-blue-700"
-        >
-          Login
-        </Link>
-      </div>
-    );
-  }
-
+export default function Page() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 text-foreground bg-background">
-      <div className="text-center max-w-2xl px-4">
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500 animate-gradient-x">
-          Your Dashboard
-        </h1>
-        <p className="text-xl text-gray-200 mb-8">
-          Welcome, {user.email?.split("@")[0]}! This is your personalized
-          dashboard for Group Fitness Manager.
-        </p>
-
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-          <Profile auth_id={user.id} />
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
+          <div className="flex items-center gap-2 px-3">
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Building Your Application
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+          <div className="flex items-center gap-2 ml-auto">
+            {" "}
+            {/* ml-auto here pushes this div and its content to the right */}
+            <Separator orientation="vertical" className="h-4" />{" "}
+            {/* No mr-2 needed here as gap-2 on parent handles it */}
+            <HomeButton />
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <div className="bg-muted/50 aspect-video rounded-xl" />
+          </div>
+          <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
         </div>
-
-        {/* --- Sign Out Button on the Dashboard --- */}
-        <form action={signOut} className="inline-block mt-4">
-          <button
-            type="submit"
-            className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 md:py-4 md:text-lg md:px-10 transition duration-300 ease-in-out"
-          >
-            Sign Out
-          </button>
-        </form>
-        {/* --- END Sign Out Button --- */}
-      </div>
-
-      <footer className="mt-20 text-sm text-gray-500">
-        <p>
-          &copy; {new Date().getFullYear()} Group Fitness Manager. All rights
-          reserved.
-        </p>
-        <p className="mt-2">Powered by Next.js and Supabase</p>
-      </footer>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
