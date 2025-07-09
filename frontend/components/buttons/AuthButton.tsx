@@ -14,7 +14,7 @@ export default async function AuthButton() {
 
     const supabase = await createClient();
     await supabase.auth.signOut();
-    return redirect("/magic");
+    return redirect("/auth/signin");
   };
 
   return user ? (
@@ -28,7 +28,7 @@ export default async function AuthButton() {
     </div>
   ) : (
     <Link
-      href="/magic"
+      href="/auth/signin"
       className="py-2 px-3 flex rounded-md no-underline bg-btn-background hover:bg-btn-background-hover"
     >
       Login

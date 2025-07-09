@@ -24,7 +24,7 @@ export default async function DashboardPage() {
           You must be logged in to view the dashboard.
         </p>
         <Link
-          href="/magic"
+          href="/auth/signin"
           className="py-2 px-4 rounded-md no-underline bg-blue-600 text-white hover:bg-blue-700"
         >
           Login

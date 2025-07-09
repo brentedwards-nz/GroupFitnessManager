@@ -13,5 +13,5 @@ export async function signOut() {
 
   // Redirect the user to a public page after logout
   // This could be the login page, or the homepage
-  redirect("/magic"); // Or redirect('/') if you prefer to go to the main homepage
+  redirect("/auth/signin"); // Or redirect('/') if you prefer to go to the main homepage
 }
