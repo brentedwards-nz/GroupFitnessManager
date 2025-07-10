@@ -12,52 +12,163 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { IconBrandGoogle, IconBrandFacebook } from "@tabler/icons-react";
-import { createClient } from "@/utils/supabase/client";
+import {
+  IconBrandGoogle,
+  IconBrandFacebook,
+  IconMail,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
-import { signInWithMagicLink } from "@/server-actions/auth/actions";
-import { useRouter } from "next/navigation";
+import {
+  signInWithMagicLink,
+  MagicSignInResult,
+} from "@/server-actions/auth/actions";
+import { createClient } from "@/utils/supabase/client";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+type OAuthProvider = "google" | "facebook";
 
-interface SignInWithMagicLinkState {
-  success: boolean;
-  message: string;
-}
+function FormComponent() {
+  const { pending } = useFormStatus();
+  const [oAuthRequest, setOAuthRequest] = useState({
+    pending: false,
+    success: false,
+    message: "",
+  });
 
-export function SignInCard() {
-  const router = useRouter();
-
-  const initialState: SignInWithMagicLinkState = {
+  const initialState: MagicSignInResult = {
     success: false,
     message: "",
   };
 
-  const [signInWithMagicLinkState, formAction] = useFormState(
+  const [signInWithMagicLinkState, formActionMagicLink] = useFormState(
     signInWithMagicLink,
     initialState
   );
 
-  const { pending } = useFormStatus();
-
-  const isDisabled = pending;
-
-  type OAuthProvider = "google" | "facebook";
-
-  const handleOAuthSignIn = async (provider: OAuthProvider) => {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    });
-
-    if (error) {
-      console.error(`Error with ${provider} sign-in:`, error.message);
-      alert(`${provider} sign-in error: ${error.message}`);
+  const signInWithOAuth = async (provider: OAuthProvider) => {
+    try {
+      setOAuthRequest({
+        pending: true,
+        success: false,
+        message: "",
+      });
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?next=/dashboard`,
+        },
+      });
+      if (error) {
+        setOAuthRequest({
+          pending: false,
+          success: false,
+          message: error.message,
+        });
+      } else {
+        setOAuthRequest({
+          pending: false,
+          success: true,
+          message: `Redirecting to ${provider}...`,
+        });
+      }
+    } catch (error) {
+      console.error("Error signing in with OAuth:", error);
+      setOAuthRequest({
+        pending: false,
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      });
     }
   };
 
+  return (
+    <>
+      <div className="flex flex-col">
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            name="email"
+            placeholder="your-email@email.com"
+            disabled={oAuthRequest.pending || pending}
+          />
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={oAuthRequest.pending || pending}
+            formAction={formActionMagicLink}
+          >
+            {pending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <IconMail />
+            )}
+            Login With Email
+          </Button>
+        </div>
+      </div>
+      <div className="flex justify-center">
+        {signInWithMagicLinkState.message && (
+          <p
+            className={`text-sm mt-2 ${
+              signInWithMagicLinkState.success
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            {signInWithMagicLinkState.message}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center my-4 w-full">
+        <div className="flex-grow h-px bg-gray-300"></div>{" "}
+        <span className="flex-shrink-0 mx-4 text-gray-500 text-sm uppercase">
+          Or continue with
+        </span>
+        <div className="flex-grow h-px bg-gray-300"></div>{" "}
+      </div>
+      <div className="space-x-2 flex justify-center w-full">
+        <Button
+          className="flex-1"
+          variant="outline"
+          onClick={() => signInWithOAuth("google")}
+          disabled={oAuthRequest.pending || pending}
+        >
+          <IconBrandGoogle />
+          Google
+        </Button>
+        <Button
+          className="flex-1"
+          variant="outline"
+          onClick={() => signInWithOAuth("facebook")}
+          disabled={oAuthRequest.pending || pending}
+        >
+          <IconBrandFacebook />
+          Facebook
+        </Button>
+      </div>
+      <div className="flex justify-center">
+        {oAuthRequest.message && !oAuthRequest.success && (
+          <p
+            className={`text-sm mt-2 ${
+              oAuthRequest.success ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {signInWithMagicLinkState.message}
+          </p>
+        )}
+      </div>
+    </>
+  );
+}
+
+export function SignInCard() {
   return (
     <Card className="w-full max-w-sm shadow-lg gap-1">
       <CardHeader className="">
@@ -71,64 +182,12 @@ export function SignInCard() {
       </CardHeader>
 
       <CardContent className="p-6 pb-0 pt-2">
-        <form action={formAction}>
-          <div className="flex flex-col">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                name="email"
-                placeholder="youremail@email.com"
-              />
-              <Button type="submit" className="w-full" disabled={isDisabled}>
-                {pending ? "Sending Magic Link..." : "Login with Magic Link"}
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-center">
-            {signInWithMagicLinkState.message && (
-              <p
-                className={`text-sm mt-2 ${
-                  signInWithMagicLinkState.success
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {signInWithMagicLinkState.message}
-              </p>
-            )}
-          </div>
+        <form>
+          <FormComponent />
         </form>
       </CardContent>
 
       <CardFooter className="flex-col gap-0">
-        <div className="flex items-center my-4 w-full">
-          <div className="flex-grow h-px bg-gray-300"></div>{" "}
-          <span className="flex-shrink-0 mx-4 text-gray-500 text-sm uppercase">
-            Or continue with
-          </span>
-          <div className="flex-grow h-px bg-gray-300"></div>{" "}
-        </div>
-        <div className="space-x-2 flex justify-center w-full">
-          <Button
-            className="flex-1"
-            variant="outline"
-            onClick={handleOAuthSignIn.bind(null, "google")}
-            disabled={isDisabled}
-          >
-            <IconBrandGoogle />
-            Google
-          </Button>
-          <Button
-            className="flex-1"
-            variant="outline"
-            onClick={handleOAuthSignIn.bind(null, "facebook")}
-            disabled={isDisabled}
-          >
-            <IconBrandFacebook />
-            Facebook
-          </Button>
-        </div>
         <div className="space-x-2 flex justify-center mt-4">
           <Link href={"/"}>Home</Link>
         </div>

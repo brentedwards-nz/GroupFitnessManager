@@ -9,16 +9,15 @@ const emailSchema = z.object({
     .min(1, { message: "Email is required." }),
 });
 
-type MagicSignInResult = {
-  loading: boolean;
+export type MagicSignInResult = {
   success: boolean;
   message: string;
 };
 
 export async function signInWithMagicLink(
-  prevState: { success: boolean; message: string },
+  prevState: MagicSignInResult,
   formData: FormData
-): Promise<{ success: boolean; message: string }> {
+): Promise<MagicSignInResult> {
   const supabase = await createClient();
   const email = formData.get("email") as string;
   const parseResult = emailSchema.safeParse({ email: email });
