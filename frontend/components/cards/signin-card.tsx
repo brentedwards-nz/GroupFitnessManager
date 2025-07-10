@@ -55,7 +55,6 @@ function FormComponent() {
         success: false,
         message: "",
       });
-      await new Promise((resolve) => setTimeout(resolve, 5000));
       const supabase = createClient();
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
