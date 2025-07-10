@@ -1,5 +1,8 @@
 import HomeButton from "@/components/buttons/HomeButton";
-import { AppSidebar } from "@/components/sidebars/sidebar-with-submenus";
+import {
+  AppSidebar,
+  NavData,
+} from "@/components/sidebars/sidebar-with-submenus";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,11 +17,51 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { ProfileCard } from "@/components/cards/profile-card";
 
 export default function Page() {
+  const data: NavData = {
+    navMain: [
+      {
+        title: "Instructor",
+        url: "#",
+        items: [
+          {
+            title: "Dashboard",
+            url: "#",
+          },
+        ],
+      },
+      {
+        title: "Club",
+        url: "#",
+        items: [
+          {
+            title: "Dashboard",
+            url: "#",
+          },
+        ],
+      },
+      {
+        title: "Admin",
+        url: "#",
+        items: [
+          {
+            title: "Profile",
+            url: "#",
+          },
+          {
+            title: "Configuration",
+            url: "#",
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar data={data} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-3">
@@ -48,7 +91,8 @@ export default function Page() {
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-xl" />
+            <ProfileCard />
+
             <div className="bg-muted/50 aspect-video rounded-xl" />
             <div className="bg-muted/50 aspect-video rounded-xl" />
           </div>

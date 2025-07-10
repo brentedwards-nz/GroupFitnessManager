@@ -15,148 +15,40 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
-const data = {
-  navMain: [
-    {
-      title: "Getting Started",
-      url: "#",
-      items: [
-        {
-          title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Building Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "API Reference",
-      url: "#",
-      items: [
-        {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
-        {
-          title: "Edge Runtime",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Architecture",
-      url: "#",
-      items: [
-        {
-          title: "Accessibility",
-          url: "#",
-        },
-        {
-          title: "Fast Refresh",
-          url: "#",
-        },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Community",
-      url: "#",
-      items: [
-        {
-          title: "Contribution Guide",
-          url: "#",
-        },
-      ],
-    },
-  ],
+/**
+ * Interface for the individual navigation item (like Installation, Routing, etc.)
+ */
+export interface NavItem {
+  title: string;
+  url: string;
+  isActive?: boolean; // 'isActive' is optional
+}
+
+/**
+ * Interface for a main navigation section (like Getting Started, Building Your Application)
+ */
+export interface NavMainSection {
+  title: string;
+  url: string;
+  items: NavItem[]; // An array of NavItem
+}
+
+/**
+ * Interface for the entire 'data' object structure
+ */
+export interface NavData {
+  navMain: NavMainSection[]; // An array of NavMainSection
+}
+
+type AppSidebarProps = React.ComponentPropsWithoutRef<typeof Sidebar> & {
+  data: NavData; // Add your NavData prop here
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export const AppSidebar = React.forwardRef<
+  React.ElementRef<typeof Sidebar>, // This is the type of the underlying DOM element ref (e.g., HTMLDivElement)
+  AppSidebarProps // This is the type of props your AppSidebar component accepts
+>(({ data, ...props }, ref) => {
+  // 'ref' is the second argument when using forwardRef
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -205,4 +97,4 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarRail />
     </Sidebar>
   );
-}
+});
