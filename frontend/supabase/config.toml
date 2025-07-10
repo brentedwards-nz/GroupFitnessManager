@@ -147,6 +147,13 @@ secret = "env(GOTRUE_EXTERNAL_GOOGLE_SECRET)"      # This should match your .env
 redirect_uri = "" # Usually leave empty, Supabase handles it or pulls from dashboard
 # url = "" # Only needed for self-hosted providers or specific custom setups
 
+[auth.external.facebook]
+enabled = true
+client_id = "env(GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID)"  # This should match your .env variable name
+secret = "env(GOTRUE_EXTERNAL_FACEBOOK_SECRET)"      # This should match your .env variable name
+redirect_uri = "" # Usually leave empty, Supabase handles it or pulls from dashboard
+# url = "" # Only needed for self-hosted providers or specific custom setups
+
 [analytics]
 enabled = false
 port = 54327

@@ -31,6 +31,7 @@ type OAuthProvider = "google" | "facebook";
 function FormComponent() {
   const { pending } = useFormStatus();
   const [oAuthRequest, setOAuthRequest] = useState({
+    provider: "",
     pending: false,
     success: false,
     message: "",
@@ -49,6 +50,7 @@ function FormComponent() {
   const signInWithOAuth = async (provider: OAuthProvider) => {
     try {
       setOAuthRequest({
+        provider: provider,
         pending: true,
         success: false,
         message: "",
@@ -58,25 +60,30 @@ function FormComponent() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/callback?next=/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       });
       if (error) {
         setOAuthRequest({
+          provider: "",
           pending: false,
           success: false,
           message: error.message,
         });
       } else {
         setOAuthRequest({
-          pending: false,
+          provider: "",
+          pending: true,
           success: true,
-          message: `Redirecting to ${provider}...`,
+          message: `Logging in via ${
+            provider.charAt(0).toUpperCase() + provider.slice(1)
+          }...`,
         });
       }
     } catch (error) {
       console.error("Error signing in with OAuth:", error);
       setOAuthRequest({
+        provider: "",
         pending: false,
         success: false,
         message:
@@ -140,7 +147,13 @@ function FormComponent() {
           onClick={() => signInWithOAuth("google")}
           disabled={oAuthRequest.pending || pending}
         >
-          <IconBrandGoogle />
+          {oAuthRequest.pending &&
+          !oAuthRequest.success &&
+          oAuthRequest.provider == "google" ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <IconBrandGoogle />
+          )}
           Google
         </Button>
         <Button
@@ -149,18 +162,24 @@ function FormComponent() {
           onClick={() => signInWithOAuth("facebook")}
           disabled={oAuthRequest.pending || pending}
         >
-          <IconBrandFacebook />
+          {oAuthRequest.pending &&
+          !oAuthRequest.success &&
+          oAuthRequest.provider == "facebook" ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <IconBrandFacebook />
+          )}
           Facebook
         </Button>
       </div>
       <div className="flex justify-center">
-        {oAuthRequest.message && !oAuthRequest.success && (
+        {oAuthRequest.message && (
           <p
             className={`text-sm mt-2 ${
-              oAuthRequest.success ? "text-green-600" : "text-red-600"
+              oAuthRequest.success ? "text-gray-500" : "text-red-600"
             }`}
           >
-            {signInWithMagicLinkState.message}
+            {oAuthRequest.message}
           </p>
         )}
       </div>
