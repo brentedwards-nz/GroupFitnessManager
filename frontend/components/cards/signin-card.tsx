@@ -16,24 +16,27 @@ import { IconBrandGoogle, IconBrandFacebook } from "@tabler/icons-react";
 import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
-import { magicSignIn } from "@/app/auth/signin/actions";
+import { signInWithMagicLink } from "@/server-actions/auth/actions";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-interface MagicSignInState {
+interface SignInWithMagicLinkState {
   success: boolean;
   message: string;
 }
 
-export function LoginCard() {
+export function SignInCard() {
   const router = useRouter();
 
-  const initialState: MagicSignInState = {
+  const initialState: SignInWithMagicLinkState = {
     success: false,
     message: "",
   };
 
-  const [state, formAction] = useFormState(magicSignIn, initialState);
+  const [signInWithMagicLinkState, formAction] = useFormState(
+    signInWithMagicLink,
+    initialState
+  );
 
   const { pending } = useFormStatus();
 
@@ -55,12 +58,6 @@ export function LoginCard() {
       alert(`${provider} sign-in error: ${error.message}`);
     }
   };
-
-  useEffect(() => {
-    if (state.message) {
-      console.log("Magic Link Status:", state.message);
-    }
-  }, [state.message, state.success, router]);
 
   return (
     <Card className="w-full max-w-sm shadow-lg gap-1">
@@ -92,13 +89,15 @@ export function LoginCard() {
             </div>
           </div>
           <div>
-            {state.message && (
+            {signInWithMagicLinkState.message && (
               <p
                 className={`text-sm mt-2 ${
-                  state.success ? "text-green-600" : "text-red-600"
+                  signInWithMagicLinkState.success
+                    ? "text-green-600"
+                    : "text-red-600"
                 }`}
               >
-                {state.message}
+                {signInWithMagicLinkState.message}
               </p>
             )}
           </div>
