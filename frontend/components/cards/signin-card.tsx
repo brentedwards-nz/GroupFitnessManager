@@ -17,7 +17,6 @@ import { createClient } from "@/utils/supabase/client";
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import { signInWithMagicLink } from "@/server-actions/auth/actions";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface SignInWithMagicLinkState {
@@ -79,16 +78,14 @@ export function SignInCard() {
               <Input
                 id="email"
                 name="email"
-                type="email"
-                placeholder="m@example.com"
-                required
+                placeholder="youremail@email.com"
               />
               <Button type="submit" className="w-full" disabled={isDisabled}>
                 {pending ? "Sending Magic Link..." : "Login with Magic Link"}
               </Button>
             </div>
           </div>
-          <div>
+          <div className="flex justify-center">
             {signInWithMagicLinkState.message && (
               <p
                 className={`text-sm mt-2 ${

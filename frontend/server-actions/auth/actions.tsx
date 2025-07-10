@@ -1,7 +1,13 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
+import { z } from "zod"; // Import zod
+
+const emailSchema = z.object({
+  email: z
+    .email({ message: "Please enter a valid email address." })
+    .min(1, { message: "Email is required." }),
+});
 
 type MagicSignInResult = {
   loading: boolean;
@@ -14,12 +20,12 @@ export async function signInWithMagicLink(
   formData: FormData
 ): Promise<{ success: boolean; message: string }> {
   const supabase = await createClient();
-
   const email = formData.get("email") as string;
-  if (!email || typeof email !== "string" || !email.includes("@")) {
+  const parseResult = emailSchema.safeParse({ email: email });
+  if (!parseResult.success) {
     return {
       success: false,
-      message: "Please enter a valid email address.",
+      message: parseResult.error.issues[0].message || "Invalid email format.",
     };
   }
 
@@ -56,6 +62,6 @@ export async function signInWithMagicLink(
 
   return {
     success: true,
-    message: "Success! Please check your email for the magic link to sign in.",
+    message: "Please check your email login link.",
   };
 }
