@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { GalleryVerticalEnd } from "lucide-react";
 
@@ -31,6 +33,7 @@ export interface NavMainSection {
   title: string;
   url: string;
   items: NavItem[]; // An array of NavItem
+  isActive?: boolean; // 'isActive' is optional
 }
 
 /**
@@ -38,6 +41,84 @@ export interface NavMainSection {
  */
 export interface NavData {
   navMain: NavMainSection[]; // An array of NavMainSection
+}
+
+export function processNavDataForActiveState(
+  navData: NavData,
+  currentPathname: string,
+  defaultSectionTitle: string = "Other"
+): NavData {
+  const cleanPathname =
+    currentPathname.endsWith("/") && currentPathname.length > 1
+      ? currentPathname.slice(0, -1)
+      : currentPathname;
+
+  let foundMatch = false;
+  let updatedNavMain: NavMainSection[] = [];
+
+  updatedNavMain = navData.navMain.map((mainSection) => {
+    const updatedItems = mainSection.items.map((item) => {
+      const cleanItemUrl =
+        item.url.endsWith("/") && item.url.length > 1
+          ? item.url.slice(0, -1)
+          : item.url;
+
+      const isActive = cleanPathname === cleanItemUrl;
+      if (isActive) {
+        foundMatch = true;
+      }
+      return { ...item, isActive };
+    });
+
+    const cleanMainSectionUrl =
+      mainSection.url.endsWith("/") && mainSection.url.length > 1
+        ? mainSection.url.slice(0, -1)
+        : mainSection.url;
+
+    const mainSectionIsActive = cleanPathname === cleanMainSectionUrl;
+    if (mainSectionIsActive) {
+      foundMatch = true;
+    }
+
+    return {
+      ...mainSection,
+      isActive: mainSectionIsActive,
+      items: updatedItems,
+    };
+  });
+
+  if (!foundMatch) {
+    const newNavItem: NavItem = {
+      title: `${
+        cleanPathname === "/"
+          ? "Home"
+          : (cleanPathname.split("/").pop() || "Unknown")
+              .charAt(0)
+              .toUpperCase() +
+            (cleanPathname.split("/").pop() || "Unknown").slice(1)
+      }`,
+      url: currentPathname,
+      isActive: true,
+    };
+
+    let otherSection = updatedNavMain.find(
+      (section) => section.title === defaultSectionTitle
+    );
+
+    if (otherSection) {
+      otherSection.items = [...otherSection.items, newNavItem];
+    } else {
+      otherSection = {
+        title: defaultSectionTitle,
+        url: currentPathname,
+        items: [newNavItem],
+        isActive: true,
+      };
+      updatedNavMain.push(otherSection);
+    }
+  }
+
+  return { navMain: updatedNavMain };
 }
 
 type AppSidebarProps = React.ComponentPropsWithoutRef<typeof Sidebar> & {
@@ -48,7 +129,23 @@ export const AppSidebar = React.forwardRef<
   React.ElementRef<typeof Sidebar>, // This is the type of the underlying DOM element ref (e.g., HTMLDivElement)
   AppSidebarProps // This is the type of props your AppSidebar component accepts
 >(({ data, ...props }, ref) => {
-  // 'ref' is the second argument when using forwardRef
+  const [currentPathname, setCurrentPathname] = React.useState<string>("");
+  const [menuItems, setMenuItems] = React.useState<NavData>({ navMain: [] });
+
+  console.log("AppSideBar...", data);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentPathname(window.location.pathname);
+      const newMenu = processNavDataForActiveState(
+        data,
+        window.location.pathname,
+        "Other"
+      );
+      setMenuItems(newMenu);
+    }
+  }, [data]);
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -71,9 +168,13 @@ export const AppSidebar = React.forwardRef<
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
-            {data.navMain.map((item) => (
+            {menuItems.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
+                <SidebarMenuButton
+                  asChild
+                  isActive={item.isActive}
+                  className="data-[active=true]:bg-gray-200"
+                >
                   <a href={item.url} className="font-medium">
                     {item.title}
                   </a>
@@ -82,7 +183,11 @@ export const AppSidebar = React.forwardRef<
                   <SidebarMenuSub>
                     {item.items.map((item) => (
                       <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild isActive={item.isActive}>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={item.isActive}
+                          className="data-[active=true]:bg-gray-200"
+                        >
                           <a href={item.url}>{item.title}</a>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>

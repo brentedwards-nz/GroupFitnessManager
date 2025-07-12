@@ -1,0 +1,80 @@
+// prisma/schema.prisma (THE DEFINITIVE VERSION - Revert to this)
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../lib/generated/prisma"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["public", "auth"] // <-- ADD "auth" BACK HERE
+}
+
+// Read-only model for auth.users (ignored by Migrate, but used for relations)
+model users {
+  id       String    @id @map("id") @db.Uuid
+  profiles profiles? // Optional relation back to profiles
+  staff    staff[] // Optional relation back to staff (array because one user can be many staff entries)
+
+  @@map("users") // Maps to the 'users' table name
+  @@ignore // CRITICAL: Tell Prisma Migrate to completely ignore this model for migrations
+  @@schema("auth") // Specifies it's in the 'auth' schema
+}
+
+// Your custom public schema models below:
+
+model club {
+  club_id      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  club_name    String
+  club_address String?
+  club_phone   String?
+  current      Boolean   @default(false)
+  disabled     Boolean   @default(true)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  staff        staff[]
+
+  @@schema("public")
+}
+
+model profiles {
+  auth_id      String    @id @db.Uuid
+  first_name   String?
+  last_name    String?
+  birth_date   DateTime? @db.Date
+  current      Boolean   @default(false)
+  disabled     Boolean   @default(true)
+  avatar_url   String?
+  contact_info Json?
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  users        users     @relation(fields: [auth_id], references: [id], onDelete: Cascade, onUpdate: NoAction) @ignore // <-- UNCOMMENTED AND @ignore IS HERE
+
+  @@schema("public")
+}
+
+model staff {
+  staff_id String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  club_id  String    @db.Uuid
+  auth_id  String    @db.Uuid
+  hired_at DateTime? @default(now()) @db.Timestamp(6)
+  current  Boolean   @default(false)
+  disabled Boolean   @default(true)
+  roles    Json?     @default("[{\"role\": \"Profile Only\"}]")
+  users    users     @relation(fields: [auth_id], references: [id], onDelete: Cascade, map: "staff_auth_id_fkey1") @ignore // <-- UNCOMMENTED AND @ignore IS HERE
+  club     club      @relation(fields: [club_id], references: [club_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([club_id, auth_id], map: "staff_club_id_profile_id_key")
+  @@schema("public")
+}
+
+enum Role {
+  SystemAdmin
+  Owner
+  Admin
+  Coordinator
+  Instructor
+  ProfileOnly
+
+  @@schema("public")
+}
