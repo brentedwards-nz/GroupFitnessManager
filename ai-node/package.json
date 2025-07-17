@@ -1,0 +1,30 @@
+{
+  "name": "ai-node",
+  "version": "1.0.0",
+  "description": "AI Node",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@hookform/resolvers": "^5.1.1",
+    "@langchain/core": "^0.3.62",
+    "@langchain/google-genai": "^0.2.14",
+    "@langchain/langgraph": "^0.3.8",
+    "@langchain/openai": "^0.5.18"
+  },
+  "keywords": [
+    "AI",
+    "Node"
+  ],
+  "author": "Brent Edwards",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.0.13",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
