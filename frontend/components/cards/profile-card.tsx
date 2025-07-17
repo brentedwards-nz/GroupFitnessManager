@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getProfile } from "@/server-actions/profile/actions";
+import { readProfile } from "@/server-actions/profile/actions";
 
 interface ProfileCardProps {
   auth_id: string;
@@ -27,7 +27,7 @@ export async function ProfileCard({ auth_id }: ProfileCardProps) {
     );
   }
 
-  const profile = await getProfile(auth_id);
+  const profile = await readProfile(auth_id);
   if (profile.success == false) {
     return (
       <Card className="w-full max-w-sm bg-white shadow-lg hover:shadow-xl">
@@ -52,7 +52,7 @@ export async function ProfileCard({ auth_id }: ProfileCardProps) {
       <CardHeader className="flex flex-col items-center">
         <Avatar className="h-24 w-24 mb-4">
           <AvatarImage
-            src={profile.data.avatar_url || "Avatar"} // This is correct!
+            src={profile.data.avatar_url ?? undefined}
             alt={profile.data.full_name || "User Avatar"} // Good practice to have a fallback alt text
           />
           <AvatarFallback>CN</AvatarFallback>

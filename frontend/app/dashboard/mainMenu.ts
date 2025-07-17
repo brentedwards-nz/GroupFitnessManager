@@ -41,6 +41,16 @@ const menuDefinition: NavData = {
         },
       ],
     },
+    {
+      title: "AI",
+      url: "/dashboard/ai",
+      items: [
+        {
+          title: "Chatbot",
+          url: "/dashboard/ai/chatbot",
+        },
+      ],
+    },
   ],
 };
 

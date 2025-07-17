@@ -132,8 +132,6 @@ export const AppSidebar = React.forwardRef<
   const [currentPathname, setCurrentPathname] = React.useState<string>("");
   const [menuItems, setMenuItems] = React.useState<NavData>({ navMain: [] });
 
-  console.log("AppSideBar...", data);
-
   React.useEffect(() => {
     if (typeof window !== "undefined") {
       setCurrentPathname(window.location.pathname);
