@@ -8,25 +8,18 @@ type FlashConfig = {};
 export const Flash = async (conversation: AIContent[]) => {
   try {
     const apiKey: string = process.env.GOOGLE_API_KEY || "";
-    console.log(`APIKEY: ${apiKey}`);
 
-    console.log(`LLM Construction...`);
     const llm = new ChatGoogleGenerativeAI({
       apiKey: apiKey,
       model: "gemini-1.5-flash",
       temperature: 0.7,
     });
-    console.log(`LLM Construction done`);
 
-    console.log(`Agent Construction...`);
     const agent = await createReactAgent({
       llm,
       tools: [],
       prompt: "You are a helpful assistant.",
     });
-    console.log(`Agent Construction done`);
-
-    console.log(`Invoke agent...`);
 
     const chatMessages: BaseMessage[] = conversation
       .filter((item) => item.type !== "error") // Filter out items where type is "error"
@@ -47,7 +40,6 @@ export const Flash = async (conversation: AIContent[]) => {
       messages: chatMessages,
     });
 
-    console.log(`Invoke agent done`);
     const serializedMessages = result.messages.map((msg: BaseMessage) => {
       // Determine message type and extract relevant data
       if (msg.getType() === "human") {
@@ -73,6 +65,6 @@ export const Flash = async (conversation: AIContent[]) => {
       messages: serializedMessages,
     };
   } catch (err: any) {
-    throw new Error(`Failed to invoke BasicAgent: ${err.message || err}`);
+    throw new Error(`Failed to invoke Flash: ${err.message || err}`);
   }
 };

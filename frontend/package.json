@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.1.1",
     "@langchain/core": "^0.3.62",
     "@langchain/google-genai": "^0.2.14",
+    "@langchain/groq": "^0.2.3",
     "@langchain/langgraph": "^0.3.8",
     "@langchain/openai": "^0.5.18",
     "@prisma/client": "^6.11.1",

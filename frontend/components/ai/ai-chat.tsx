@@ -1,7 +1,19 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { AIContent, AIConversation, agentQuery } from "@/utils/ai/agent/agent";
+import {
+  AIContent,
+  AIConversation,
+  agentQuery,
+  LLMType,
+} from "@/utils/ai/agent/agent";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface MessageDisplayProps {
   message: string;
@@ -32,6 +44,7 @@ const AIChat: React.FC = () => {
   const [messages, setMessages] = useState<AIContent[]>([]);
   const [input, setInput] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedLLM, setSelectedLLM] = useState<LLMType>("Groq");
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,7 +65,7 @@ const AIChat: React.FC = () => {
 
       try {
         const conversation: AIConversation = {
-          model: "Gemini",
+          model: selectedLLM,
           conversation: newRequest,
         };
         const aiResponse = await agentQuery(conversation);
@@ -72,6 +85,10 @@ const AIChat: React.FC = () => {
     if (e.key === "Enter") {
       handleSendMessage();
     }
+  };
+
+  const handleDropdownSelect = (option: LLMType) => {
+    setSelectedLLM(option);
   };
 
   return (
@@ -113,6 +130,27 @@ const AIChat: React.FC = () => {
         >
           Send
         </button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="ml-3 h-auto px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              {selectedLLM}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48">
+            <DropdownMenuItem onClick={() => handleDropdownSelect("Gemini")}>
+              Gemini
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDropdownSelect("Groq")}>
+              Groq
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDropdownSelect("ChatGPT")}>
+              ChatGPT
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
