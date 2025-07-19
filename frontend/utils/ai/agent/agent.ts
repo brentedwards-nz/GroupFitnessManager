@@ -81,71 +81,6 @@ export const agentQuery = async (
       type: "error",
     };
   }
-
-  // try {
-  //   switch (request.model) {
-  //     case "Gemini":
-  //       {
-  //         const aiResponse = await Flash(request.conversation);
-  //         const response: any | undefined =
-  //           aiResponse.messages[aiResponse.messages.length - 1];
-
-  //         if (response) {
-  //           return {
-  //             id: Date.now() + 1,
-  //             content: response.content,
-  //             type: "ai",
-  //           };
-  //         }
-  //       }
-  //       throw new AIError("Undefined Gemini response error");
-
-  //     case "ChatGPT":
-  //       {
-  //         const aiResponse = await Turbo(request.conversation);
-  //         const response: any | undefined =
-  //           aiResponse.messages[aiResponse.messages.length - 1];
-
-  //         if (response) {
-  //           return {
-  //             id: Date.now() + 1,
-  //             content: response.content,
-  //             type: "ai",
-  //           };
-  //         }
-  //       }
-  //       throw new AIError("Undefined OpenAI response error");
-
-  //     case "Groq":
-  //       {
-  //         const aiResponse = await LLama3({request.conversation, []});
-  //         const response: any | undefined =
-  //           aiResponse.messages[aiResponse.messages.length - 1];
-
-  //         if (response) {
-  //           return {
-  //             id: Date.now() + 1,
-  //             content: response.content,
-  //             type: "ai",
-  //           };
-  //         }
-  //       }
-  //       throw new AIError("Undefined Groq response error");
-  //   }
-  // } catch (error: any) {
-  //   if (error instanceof AIError) {
-  //     return {
-  //       id: Date.now() + 1,
-  //       content: error.message,
-  //       type: "error",
-  //     };
-  //   }
-  //   return {
-  //     id: Date.now() + 1,
-  //     content: `An Error occurred: ${error.message}`,
-  //     type: "error",
-  //   };
-  // }
 };
 
 const getLLM = (
@@ -155,7 +90,7 @@ const getLLM = (
     case "Gemini": {
       const apiKey: string = process.env.GOOGLE_API_KEY || "";
       if (!apiKey) {
-        throw new Error("GROQ_API_KEY environment variable is not set.");
+        throw new Error("GOOGLE_API_KEY environment variable is not set.");
       }
       return new ChatGoogleGenerativeAI({
         apiKey: apiKey,
@@ -164,13 +99,13 @@ const getLLM = (
       });
     }
     case "ChatGPT": {
-      const apiKey: string = process.env.OPENAI_API_KEY || ""; // Changed to OPENAI_API_KEY
+      const apiKey: string = process.env.OPENAI_API_KEY || "";
       if (!apiKey) {
-        throw new Error("GROQ_API_KEY environment variable is not set.");
+        throw new Error("OPENAI_API_KEY environment variable is not set.");
       }
       return new ChatOpenAI({
         apiKey: apiKey,
-        model: "gpt-3.5-turbo", // Changed model to a ChatGPT model
+        model: "gpt-3.5-turbo",
         temperature: 0.7,
       });
     }
