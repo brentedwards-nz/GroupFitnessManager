@@ -12,6 +12,10 @@ const menuDefinition: NavData = {
       url: "/dashboard/instructor",
       items: [
         {
+          title: "AI",
+          url: "/dashboard/instructor/ai",
+        },
+        {
           title: "Profile",
           url: "/dashboard/instructor/profile",
         },

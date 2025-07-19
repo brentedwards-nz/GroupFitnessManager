@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { agentQuery } from "@/utils/ai/agent/agent";
 import {
   AIContent,
   AIConversation,
-  agentQuery,
   LLMType,
-} from "@/utils/ai/agent/agent";
+} from "@/utils/ai/agent/agentTypes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,6 +66,8 @@ const AIChat: React.FC = () => {
       try {
         const conversation: AIConversation = {
           model: selectedLLM,
+          prompt: "You are a helpful ai that give brief and concise help",
+          tools: [],
           conversation: newRequest,
         };
         const aiResponse = await agentQuery(conversation);
