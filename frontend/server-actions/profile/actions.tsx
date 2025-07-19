@@ -63,6 +63,7 @@ export async function readProfile(
   }
 
   try {
+    console.log("Read profile... 1");
     const profile = await prisma.profiles.findUnique({
       where: {
         auth_id: user_id,
@@ -80,6 +81,7 @@ export async function readProfile(
       },
     });
 
+    console.log("Read profile... 2");
     if (!profile) {
       console.warn(
         `Profile not found for auth_id: ${user_id}. Returning empty profile.`
@@ -91,6 +93,7 @@ export async function readProfile(
       };
     }
 
+    console.log("Read profile... 3");
     const contact_info = Array.isArray(profile.contact_info)
       ? (profile.contact_info as ContactInfoItem[])
       : typeof profile.contact_info === "string"
@@ -106,6 +109,7 @@ export async function readProfile(
       ? contact_info.find((item) => item.type === "email")?.value
       : "";
 
+    console.log("Read profile... 4");
     const profileResult: Profile = {
       auth_id: profile.auth_id,
       first_name: profile?.first_name ?? "** First name required **",
@@ -123,11 +127,15 @@ export async function readProfile(
       primary_email: firstEmailItem,
     };
 
+    console.log("Read profile... 5");
     return {
       success: true,
       data: profileResult,
     };
   } catch (err: any) {
+    console.log("Read profile...Failed");
+    console.error(err);
+
     return {
       success: false,
       message: `An unexpected server error occurred: ${
