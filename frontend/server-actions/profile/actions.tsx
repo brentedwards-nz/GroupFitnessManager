@@ -133,8 +133,8 @@ export async function readProfile(
       data: profileResult,
     };
   } catch (err: any) {
-    console.log("Read profile...Failed");
-    console.log(JSON.stringify(err, null, 2));
+    console.error("Read profile...Failed:", err); // <--- CHANGE THIS LINE
+    // console.log(JSON.stringify(err, null, 2)); // <--- REMOVE OR COMMENT THIS LINE
 
     return {
       success: false,
