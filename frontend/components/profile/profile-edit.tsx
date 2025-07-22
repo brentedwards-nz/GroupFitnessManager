@@ -99,12 +99,31 @@ export function ProfileEditForm({
   });
 
   const handlePrimaryChange = (indexToSetPrimary: number) => {
-    const currentContactInfo = form.getValues("contact_info");
-    const updatedContactInfo = currentContactInfo?.map((item, idx) => ({
-      ...item,
-      primary: idx === indexToSetPrimary,
-    }));
-    form.setValue("contact_info", updatedContactInfo!, { shouldDirty: true });
+    const contactInfos = form.getValues("contact_info");
+
+    let updatedContactInfos: {
+      type: "email" | "phone" | "address" | "social";
+      value: string;
+      primary: boolean;
+      id?: string | undefined;
+      label?: string | null | undefined;
+    }[] = [];
+
+    if (contactInfos) {
+      const selectedInfo = contactInfos[indexToSetPrimary];
+      contactInfos.forEach((contactInfo, index, array) => {
+        if (contactInfo.type == selectedInfo.type) {
+          if (index == indexToSetPrimary) {
+            updatedContactInfos.push({ ...contactInfo, primary: true });
+          } else {
+            updatedContactInfos.push({ ...contactInfo, primary: false });
+          }
+        } else {
+          updatedContactInfos.push(contactInfo);
+        }
+      });
+    }
+    form.setValue("contact_info", updatedContactInfos!, { shouldDirty: true });
   };
 
   const handleFormSubmit = (data: ProfileFormValues) => {
