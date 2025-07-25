@@ -44,6 +44,12 @@ export async function ClubCard({
       <CardContent>
         <div className="grid w-full items-center gap-4">
           <div className="flex flex-col space-y-1.5  min-w-0">
+            <p className="text-sm font-medium leading-none">Club Id:</p>
+            <p className="text-sm text-muted-foreground truncate">
+              {club_id || "No address provided"}
+            </p>
+          </div>
+          <div className="flex flex-col space-y-1.5  min-w-0">
             <p className="text-sm font-medium leading-none">Address:</p>
             <p className="text-sm text-muted-foreground truncate">
               {club_address || "No address provided"}

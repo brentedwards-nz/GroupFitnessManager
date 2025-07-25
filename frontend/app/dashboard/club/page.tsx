@@ -6,19 +6,21 @@ import AIChat from "@/components/ai/ai-chat"; // If AIChat also needs "use clien
 import { readClubs } from "@/server-actions/clubs/actions";
 import { Club } from "@/server-actions/clubs/types";
 import { ClubCardProps } from "@/components/cards/club-card";
-// No useState, useEffect, useCallback imports here for the page itself
 
 const transformClubs = (clubsData: Club[]): ClubCardProps[] => {
-  return clubsData.map((club: Club) => ({
-    club_id: club.club_id,
-    club_name: club.club_name,
-    club_address: club.club_address,
-    club_phone: club.club_phone,
-    current: club.current,
-    disabled: club.disabled,
-    created_at: club.created_at,
-    club_avatar: "",
-  }));
+  return clubsData.map(
+    (club: Club) =>
+      ({
+        club_id: club.club_id,
+        club_name: club.club_name,
+        club_address: club.club_address,
+        club_phone: club.club_phone,
+        current: club.current,
+        disabled: club.disabled,
+        created_at: club.created_at,
+        club_avatar: "",
+      } as ClubCardProps)
+  );
 };
 
 export default async function ClubPage() {
@@ -77,11 +79,9 @@ export default async function ClubPage() {
       <div className="grid auto-rows-min gap-4 md:grid-cols-2">
         <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min">
           <Clubs clubs={clubs} />{" "}
-          {/* Clubs component itself can be client or server */}
         </div>
         <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min">
           <AIChat />{" "}
-          {/* If AIChat needs client-side interactivity, it remains "use client" */}
         </div>
       </div>
     </div>

@@ -10,7 +10,7 @@ const Clubs = ({ clubs }: ClubsProps) => {
       <div className="grid gap-y-4">
         {clubs.map((club, index) => (
           <ClubCard
-            key={club.club_id}
+            key={index}
             club_id={club.club_id}
             club_address={club.club_address}
             club_name={club.club_name}

@@ -143,6 +143,9 @@ export async function readClub(club_id: string): Promise<ActionResult<Club>> {
 }
 
 export async function updateClub(clubData: Club): Promise<ActionResult<Club>> {
+  console.log("*** server-actions/clubs/actions/updateClub ***");
+  console.log(JSON.stringify(clubData, null, 2) + "\n");
+
   try {
     const supabase = await createClient();
 
@@ -151,30 +154,44 @@ export async function updateClub(clubData: Club): Promise<ActionResult<Club>> {
     } = await supabase.auth.getUser();
 
     if (!user) {
+      console.log("Unauthorized: You must be logged in.");
       throw new Error("Unauthorized: You must be logged in.");
     }
 
-    const validationResult = ClubSchema.safeParse({
-      clubData,
-    });
+    console.log(JSON.stringify(clubData, null, 2));
+    const validationResult = ClubSchema.safeParse(clubData);
     if (!validationResult.success) {
+      console.log("Invalid club data: ");
+      console.error(validationResult.error);
       throw new Error("Invalid club data.");
     }
 
     const validatedData = validationResult.data;
 
-    const updatedOrCreatedRecord = await prisma.club.upsert({
+    let foundClub: string = "";
+    if (clubData.club_id == undefined) {
+      const clubByName = await prisma.club.findFirst({
+        where: {
+          club_name: clubData.club_name || undefined,
+        },
+        select: {
+          club_id: true,
+        },
+      });
+
+      if (!clubByName) {
+        throw new Error("Could not find club by name");
+      }
+      foundClub = clubByName?.club_id || "";
+    }
+
+    const club_id = clubData.club_id || foundClub;
+
+    const updatedOrCreatedRecord = await prisma.club.update({
       where: {
-        club_id: validatedData.club_id,
+        club_id: club_id,
       },
-      update: {
-        club_name: validatedData.club_name,
-        club_address: clubData.club_address,
-        club_phone: clubData.club_phone,
-        current: validatedData.current,
-        disabled: validatedData.disabled,
-      },
-      create: {
+      data: {
         club_name: validatedData.club_name,
         club_address: clubData.club_address,
         club_phone: clubData.club_phone,
@@ -210,6 +227,91 @@ export async function updateClub(clubData: Club): Promise<ActionResult<Club>> {
       data: clubResult,
     };
   } catch (err: any) {
+    console.log(
+      `An unexpected server error occurred: ${err.message || "Unknown error"}`
+    );
+
+    return {
+      success: false,
+      message: `An unexpected server error occurred: ${
+        err.message || "Unknown error"
+      }`,
+      code: "UNEXPECTED_SERVER_ERROR",
+      details:
+        process.env.NODE_ENV === "development"
+          ? { stack: err.stack, prismaError: err.code || "N/A" }
+          : undefined,
+    };
+  }
+}
+
+export async function createClub(clubData: Club): Promise<ActionResult<Club>> {
+  console.log("*** server-actions/clubs/actions/createClub ***");
+  console.log(JSON.stringify(clubData, null, 2) + "\n");
+
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.log("Unauthorized: You must be logged in.");
+      throw new Error("Unauthorized: You must be logged in.");
+    }
+
+    console.log(JSON.stringify(clubData, null, 2));
+    const validationResult = ClubSchema.safeParse(clubData);
+    if (!validationResult.success) {
+      console.log("Invalid club data: ");
+      console.error(validationResult.error);
+      throw new Error("Invalid club data.");
+    }
+
+    const validatedData = validationResult.data;
+
+    const updatedOrCreatedRecord = await prisma.club.create({
+      data: {
+        club_name: validatedData.club_name,
+        club_address: clubData.club_address,
+        club_phone: clubData.club_phone,
+        current: validatedData.current,
+        disabled: validatedData.disabled,
+      },
+      select: {
+        club_id: true,
+        club_name: true,
+        club_address: true,
+        club_phone: true,
+        current: true,
+        disabled: true,
+        created_at: true,
+      },
+    });
+
+    revalidatePath("/dashboard/profile");
+    revalidatePath("/dashboard");
+
+    const clubResult: Club = {
+      club_id: updatedOrCreatedRecord.club_id,
+      club_name: updatedOrCreatedRecord.club_name,
+      club_address: updatedOrCreatedRecord.club_address,
+      club_phone: updatedOrCreatedRecord.club_phone,
+      current: updatedOrCreatedRecord.current,
+      disabled: updatedOrCreatedRecord.disabled,
+      created_at: updatedOrCreatedRecord.created_at,
+    };
+
+    return {
+      success: true,
+      data: clubResult,
+    };
+  } catch (err: any) {
+    console.log(
+      `An unexpected server error occurred: ${err.message || "Unknown error"}`
+    );
+
     return {
       success: false,
       message: `An unexpected server error occurred: ${

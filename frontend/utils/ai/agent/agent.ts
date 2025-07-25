@@ -7,18 +7,23 @@ import { ChatGroq } from "@langchain/groq";
 import { BaseMessage, AIMessage } from "@langchain/core/messages";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { LLMType, AIConversation, AIContent, AIError } from "./agentTypes";
+import { getTool } from "@/utils/ai/toolManager/toolManager";
 
 export const agentQuery = async (
   request: AIConversation
 ): Promise<AIContent> => {
-  console.log(JSON.stringify(request, null, 2));
+  //console.log(JSON.stringify(request, null, 2));
 
   try {
+    const tools = request.toolList.map((toolId) => {
+      return getTool(toolId);
+    });
+
     const llm = getLLM(request.model);
     const agent = await createReactAgent({
       llm,
-      tools: [],
-      prompt: "You are a helpful assistant.",
+      tools: tools,
+      prompt: "You are a helpful assistant.\n" + request.prompt,
     });
 
     const chatMessages: BaseMessage[] = request.conversation
@@ -36,6 +41,8 @@ export const agentQuery = async (
     const result = await agent.invoke({
       messages: chatMessages,
     });
+
+    //console.log(JSON.stringify(result, null, 2));
 
     const serializedMessages = result.messages.map((msg: BaseMessage) => {
       // Determine message type and extract relevant data

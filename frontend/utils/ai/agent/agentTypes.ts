@@ -1,4 +1,5 @@
 import { DynamicTool } from "@langchain/core/tools";
+import { ToolType } from "../toolManager/toolManager";
 
 export type LLMType = "Gemini" | "ChatGPT" | "Groq";
 
@@ -11,13 +12,13 @@ export type AIContent = {
 export type AITool = {
   name: string;
   prompt: string;
-  tools: DynamicTool;
+  tool: DynamicTool<string>;
 };
 
 export type AIConversation = {
   model: LLMType;
   prompt: string;
-  tools: AITool[];
+  toolList: ToolType[];
   conversation: AIContent[];
 };
 

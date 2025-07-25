@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { agentQuery } from "@/utils/ai/agent/agent";
 import {
+  AITool,
   AIContent,
   AIConversation,
   LLMType,
@@ -67,7 +68,7 @@ const AIChat: React.FC = () => {
         const conversation: AIConversation = {
           model: selectedLLM,
           prompt: "You are a helpful ai that give brief and concise help",
-          tools: [],
+          toolList: ["action.club.create", "action.club.update"],
           conversation: newRequest,
         };
         const aiResponse = await agentQuery(conversation);
