@@ -11,6 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { mainMenu } from "./mainMenu";
 
 export const metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({
         <main className="flex-1 flex flex-col">
           {/* {children}{" "} */}
           {children}
+          <Toaster richColors />
           {/* This is where your page content will be rendered */}
         </main>
       </SidebarInset>

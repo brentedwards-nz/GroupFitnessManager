@@ -9,7 +9,12 @@ export async function GET(request: NextRequest) {
   // The 'next' path to redirect to after successful login (defaults to '/')
   const next = requestUrl.searchParams.get("next") ?? "/";
 
-  console.log("auth/callback route called next:", next); // This log is fine
+  //console.log("auth/callback route called next:", next); // This log is fine
+
+  console.log("---------------------------------------");
+  console.log(" - app/auth/callback/route.ts");
+  console.log(" - code:" + code);
+  console.log("---------------------------------------");
 
   if (code) {
     // Check if the 'code' parameter exists

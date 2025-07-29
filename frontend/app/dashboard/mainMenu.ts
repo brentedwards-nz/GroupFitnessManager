@@ -29,6 +29,14 @@ const menuDefinition: NavData = {
           title: "Overview",
           url: "/dashboard/club/overview",
         },
+        {
+          title: "Email",
+          url: "/dashboard/club/email",
+        },
+        {
+          title: "Email Auth",
+          url: "/dashboard/club/email_auth",
+        },
       ],
     },
     {
@@ -41,7 +49,7 @@ const menuDefinition: NavData = {
         },
         {
           title: "Configuration",
-          url: "#",
+          url: "/dashboard/admin/configuration",
         },
       ],
     },
